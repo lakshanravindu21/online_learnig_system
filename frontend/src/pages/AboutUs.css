@@ -1,0 +1,310 @@
+.about-section {
+  padding: 0px;
+  background: linear-gradient(90deg, #d6f1f6, #f6d6f3);
+  font-family: Arial, sans-serif;
+}
+
+.breadcrumb {
+    padding: 40px;
+  font-size: 14px;
+  color: #555;
+  margin-bottom: 10px;
+}
+
+.about-heading {
+  padding: 40px;
+  font-size: 36px;
+  font-weight: bold;
+  color: #111;
+  margin-bottom: 30px;
+  line-height: 1.3;
+}
+
+.about-content {
+  position: relative;
+  display: inline-block;
+}
+
+.about-image {
+  width: 100%;
+  min-width: 1520px;
+  height: 482px;
+  border-radius: 10px;
+  display: block;
+  
+}
+
+.experience-card {
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  background: #fff;
+  padding: 20px 25px;
+  border-radius: 12px;
+  box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.15);
+  width: 280px;
+}
+
+.experience-number {
+  font-size: 40px;
+  font-weight: bold;
+  color: #111;
+  margin: 0;
+}
+
+.experience-title {
+  font-size: 18px;
+  font-weight: 600;
+  margin: 5px 0;
+  color: #333;
+}
+
+.experience-desc {
+  font-size: 14px;
+  line-height: 1.6;
+  color: #555;
+}
+/* ChooseSection.css */
+
+.choose-section {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 60px 40px;
+  gap: 40px;
+  font-family: Arial, sans-serif;
+  max-width: 1200px; /* Added for better layout control */
+  margin: 0 auto; /* Center the section */
+}
+
+.choose-left {
+  flex: 1;
+  padding-right: 20px; /* Add some spacing */
+}
+
+.choose-heading {
+  font-size: 38px; /* Slightly larger for impact */
+  font-weight: bold;
+  color: #1a202c; /* Darker text for better contrast */
+  margin-bottom: 20px;
+  line-height: 1.2;
+}
+
+.choose-subtext {
+  font-size: 16px;
+  color: #4a5568; /* Slightly lighter than heading */
+  margin-bottom: 30px;
+  line-height: 1.7;
+}
+
+.choose-feature {
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: 25px;
+  gap: 20px;
+}
+
+.choose-feature h3 {
+  font-size: 20px;
+  font-weight: 700;
+  margin: 0 0 8px;
+  color: #1a202c;
+}
+
+.choose-feature p {
+  font-size: 15px;
+  color: #4a5568;
+  margin: 0;
+  line-height: 1.6;
+}
+
+.icon {
+  font-size: 24px; /* Larger icon size */
+  width: 55px; /* Larger background circle */
+  height: 55px; /* Larger background circle */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  flex-shrink: 0; /* Prevent icon from shrinking */
+}
+
+.icon.green {
+  background: #ecfdf5; /* Lighter green */
+  color: #10b981; /* Brighter green */
+}
+
+.icon.pink {
+  background: #fdf2f8; /* Lighter pink */
+  color: #ec4899; /* Brighter pink */
+}
+
+.icon.purple {
+  background: #ede9fe; /* Original purple is good */
+  color: #7c3aed; /* Original purple is good */
+}
+
+.choose-right {
+  flex: 1;
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.image-stack-container {
+  position: relative;
+  width: 100%;
+  max-width: 500px;
+  height: 0;
+  padding-bottom: 90%; /* Adjust this value to control the aspect ratio */
+}
+
+.stacked-image {
+  position: absolute;
+  width: 100%;
+  border-radius: 15px;
+  box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.1);
+  object-fit: cover;
+}
+
+.top-image {
+  top: 0;
+  left: 0;
+  height: 65%;
+  z-index: 2;
+}
+
+.bottom-image {
+  bottom: 0;
+  right: 0;
+  width: 70%;
+  height: 60%;
+  z-index: 1;
+  transform: translateX(10%);
+  box-shadow: 0px 8px 25px rgba(0, 0, 0, 0.12);
+}
+
+.students-card {
+  position: absolute;
+  top: 10px;
+  right: -30px;
+  background: #fff;
+  padding: 15px 20px;
+  border-radius: 15px;
+  box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.15);
+  text-align: center;
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.students-card p {
+  font-size: 16px;
+  font-weight: 700;
+  color: #1a202c;
+  margin: 0;
+}
+
+.students-card .students-img {
+  width: 40px; /* Reduced width for smaller avatars */
+  height: 40px; /* Make them circular */
+  border-radius: 50%; /* Create a circular shape */
+  border: 2px solid #fff; /* White border for the layered effect */
+  margin-left: -10px; /* Overlap the images */
+}
+
+/* Specific styling for the first image to remove the negative margin */
+.students-card .students-img:first-child {
+  margin-left: 0;
+}
+
+/* Optional: Add a class for the "add" button if needed */
+.add-student-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: #e6f8f1;
+  color: #2e9b6f;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 20px;
+  font-weight: bold;
+}
+
+/* Responsive adjustments */
+@media (max-width: 992px) {
+  .choose-section {
+    flex-direction: column;
+    padding: 40px 20px;
+    gap: 30px;
+  }
+
+  .choose-left, .choose-right {
+    padding: 0;
+  }
+
+  .choose-heading {
+    font-size: 30px;
+  }
+
+  .choose-subtext {
+    font-size: 15px;
+  }
+
+  .choose-right {
+    order: -1; /* Move image section above text on smaller screens */
+    margin-bottom: 30px;
+  }
+
+  .choose-image {
+    max-width: 100%;
+  }
+
+  .students-card {
+    top: 10px;
+    right: 10px; /* Adjust for smaller screens */
+    transform: translateX(0); /* Remove right offset */
+  }
+}
+
+/* @media (max-width: 576px) {
+  .choose-section {
+    padding: 30px 15px;
+  }
+
+  .choose-heading {
+    font-size: 26px;
+  }
+
+  .choose-feature h3 {
+    font-size: 18px;
+  }
+
+  .choose-feature p {
+    font-size: 14px;
+  }
+
+  .icon {
+    width: 45px;
+    height: 45px;
+    font-size: 20px;
+  }
+
+  .students-card {
+    padding: 10px 15px;
+    top: 5px;
+    right: 5px;
+  }
+
+  .students-card p {
+    font-size: 14px;
+  }
+
+  .students-img {
+    width: 90px;
+  }
+} */
