@@ -28,7 +28,7 @@ const Learning = () => {
 
   {/* Right side: image */}
   <div className="flex-1 flex items-center justify-center">
-    <div className="w-36 h-36 relative overflow-hidden rounded-xl">
+    <div className="w-39 h-39 relative overflow-hidden rounded-xl">
       <img
         src={Boy}
         alt="Boy"
@@ -65,7 +65,7 @@ const Learning = () => {
 
             {/* Right side: image */}
             <div className="flex-1 flex items-center justify-center">
-              <div className="w-36 h-36 relative overflow-hidden rounded-xl">
+              <div className="w-140 h-140 relative overflow-hidden rounded-xl">
                 <img
                   src={Girl}
                   alt="Girl"
