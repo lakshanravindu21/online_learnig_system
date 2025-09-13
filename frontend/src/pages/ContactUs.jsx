@@ -28,20 +28,18 @@ const ContactUs = () => {
 
   return (
     <>
-      {/* ✅ Added Header here */}
       <Header />
 
       <div className="min-h-screen bg-white p-5 font-sans">
         {/* Breadcrumb */}
-        <div className="max-w-[1200px] mx-auto py-5 text-sm text-gray-600">
+        <div className="max-w-[1200px] mx-auto py-5 text-gray-600 flex items-center gap-1 text-base md:text-lg">
           <a href="/" className="hover:text-gray-800 transition-colors">Home</a>
-          <span className="mx-2">/</span>
+          <span className="mx-2 align-middle">/</span>
           <span className="font-medium text-gray-800">Contact Us</span>
         </div>
 
         {/* Contact Container */}
         <div className="max-w-[1200px] mx-auto">
-          {/* Form + Image */}
           <div className="grid md:grid-cols-2 gap-16 md:gap-16 items-center mb-20">
             {/* Contact Form */}
             <div className="pr-10 md:pr-10">
@@ -102,7 +100,6 @@ const ContactUs = () => {
                   ></textarea>
                 </div>
 
-                {/* ✅ Modern Send Message Button */}
                 <button
                   type="submit"
                   className="flex items-center border-2 border-gray-800 rounded-full px-8 py-3 text-gray-900 font-bold text-lg hover:shadow-2xl hover:scale-105 hover:border-emerald-600 hover:bg-white/30 transition-all duration-300 group self-start mt-4"
@@ -124,19 +121,18 @@ const ContactUs = () => {
             </div>
 
             {/* Contact Image */}
-            <div className="relative flex justify-center items-start mt-[-40px]"> 
-              {/* ✅ moved up by negative margin */}
-              <div className="absolute -top-12 -right-28 w-24 h-12 bg-[radial-gradient(circle,_#bbb_2px,_transparent_2px)] bg-[length:15px_16px] z-10"></div>
+            <div className="relative flex justify-center items-start mt-[-40px] group"> 
+              {/* Hover effect on image */}
               <img
                 src={contactImage}
                 alt="Customer service representative"
-                className="w-full max-w-[400px] h-[450px] rounded-xl shadow-2xl relative z-20"
+                className="w-full max-w-[400px] h-[450px] rounded-xl shadow-2xl relative z-20 transition-transform duration-500 ease-in-out group-hover:scale-105"
               />
             </div>
           </div>
         </div>
 
-        {/* Contact Info Section ✅ increased background height */}
+        {/* Contact Info Section */}
         <div className="w-full bg-pink-50 py-24">  
           <div className="max-w-[1200px] mx-auto px-6">
             <div className="grid md:grid-cols-3 gap-10">
@@ -182,11 +178,9 @@ const ContactUs = () => {
           </div>
         </div>
 
-        {/* FAQ Section */}
         <FAQ />
       </div>
 
-      {/* ✅ Added Footer here */}
       <Footer />
     </>
   );
