@@ -17,32 +17,32 @@ const Hero = () => {
         </div>
 
         {/* Heading */}
-        <h1 className="px-10 text-4xl font-bold text-gray-900 leading-snug mb-8">
-          Providing Unrivaled <br /> Quality in Online Courses
-        </h1>
+      <h1 className="px-4 md:px-10 text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 leading-snug mb-6 md:mb-8">
+        Providing Unrivaled <br className="hidden sm:block" /> Quality in Online Courses
+      </h1>
 
-        {/* Content */}
-        <div className="relative inline-block w-full">
-          <img
-            src={laptopImg}
-            alt="Laptop with coffee"
-            className="w-full min-w-[1520px] h-[482px] rounded-lg object-cover"
-          />
+      {/* Content */}
+      <div className="relative w-full">
+        <img
+          src={laptopImg}
+          alt="Laptop with coffee"
+          className="w-full h-48 sm:h-72 md:h-[482px] rounded-lg object-cover"
+        />
 
-          {/* Experience Card */}
-          <div className="absolute bottom-5 right-5 bg-white p-6 rounded-xl shadow-lg w-72">
-            <h2 className="text-4xl font-bold text-gray-900">10+</h2>
-            <p className="text-lg font-semibold text-gray-700 mt-1">
-              Years of Experience
-            </p>
-            <p className="text-sm text-gray-600 mt-2 leading-relaxed">
-              Leveraging 10+ years in the field, our online courses offer
-              expertly developed content, designed to support learners with
-              engaging and impactful education.
-            </p>
-          </div>
+        {/* Experience Card */}
+        <div className="absolute bottom-4 right-4 bg-white p-4 sm:p-6 rounded-xl shadow-lg w-60 sm:w-72 max-w-[90%]">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900">10+</h2>
+          <p className="text-base sm:text-lg font-semibold text-gray-700 mt-1">
+            Years of Experience
+          </p>
+          <p className="text-xs sm:text-sm text-gray-600 mt-2 leading-relaxed">
+            Leveraging 10+ years in the field, our online courses offer expertly
+            developed content, designed to support learners with engaging and
+            impactful education.
+          </p>
         </div>
-      </section>
+      </div>
+    </section>
     </div>
   );
 };
