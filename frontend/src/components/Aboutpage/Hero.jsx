@@ -10,7 +10,11 @@ const Hero = () => {
     <div>
       <section className="bg-gradient-to-r from-[#d6f1f6] to-[#f6d6f3] font-sans">
         {/* Breadcrumb */}
-        <p className="px-10 pt-10 text-sm text-gray-600 mb-2">Home / About Us</p>
+        <div className="max-w-[1200px] mx-auto py-5 text-gray-600 flex items-center gap-1 text-base md:text-lg">
+          <a href="/" className="hover:text-gray-800 transition-colors">Home</a>
+          <span className="mx-2 align-middle">/</span>
+          <span className="font-medium text-gray-800">About Us</span>
+        </div>
 
         {/* Heading */}
         <h1 className="px-10 text-4xl font-bold text-gray-900 leading-snug mb-8">
