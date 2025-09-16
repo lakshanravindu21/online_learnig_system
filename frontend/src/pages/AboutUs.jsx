@@ -7,6 +7,7 @@ import Showcase from "../components/Aboutpage/Showcase";
 import Journey from "../components/Aboutpage/Journey";
 import Learning from "../components/Aboutpage/Learning";
 import LearningExperienceSection from "../components/Aboutpage/LearningExperienceSection";  
+import FAQ from "../pages/FAQ";
 
 const AboutUs = () => {
   return (
@@ -18,6 +19,7 @@ const AboutUs = () => {
         <Showcase />
         <Learning />
         <LearningExperienceSection />
+        <FAQ />
       </div>
       <Footer />
     </>
