@@ -15,9 +15,9 @@ export default function CourseSection() {
   return (
     <>
       <Header />
-      <section className="relative w-full min-h-screen bg-[#F5F7FA] flex flex-col items-center py-16">
+    <section className="relative w-full min-h-screen bg-[#F5F7FA] flex flex-col items-center py-8 md:py-12 lg:py-16">
       {/* Container */}
-      <div className="relative w-full max-w-[1240px] mx-auto">
+  <div className="relative w-full max-w-[95vw] xl:max-w-[1240px] mx-auto px-2 sm:px-4 md:px-6 lg:px-8">
         {/* Breadcrumb */}
         <div className="flex items-center mb-4 text-base font-outfit text-[#011813]">
           <span className="font-normal">Home</span>
@@ -25,12 +25,12 @@ export default function CourseSection() {
           <span className="font-normal text-[#009D77]">Courses</span>
         </div>
         {/* Section Title Block */}
-        <div className="flex items-center justify-between mb-12">
-          <h1 className="text-black font-outfit font-bold text-5xl md:text-7xl leading-tight max-w-3xl">
+  <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-8 md:mb-12 gap-4 md:gap-0">
+          <h1 className="text-black font-outfit font-bold text-2xl sm:text-3xl md:text-5xl lg:text-6xl xl:text-7xl leading-tight max-w-full md:max-w-3xl">
             We Offer an Outstanding<br />Learning Experience
           </h1>
           {/* Dot Image */}
-          <svg width="108" height="46" className="hidden md:block" viewBox="0 0 108 46" fill="none">
+           <svg width="108" height="46" className="hidden md:block" viewBox="0 0 108 46" fill="none">
             {[0, 19, 38, 57, 76, 96].map((x) =>
               [0, 21, 45].map((y) => (
                 <circle key={`${x}-${y}`} cx={x + 6} cy={y + 6} r="4" fill="#8D8E8F" />
@@ -39,14 +39,14 @@ export default function CourseSection() {
           </svg>
         </div>
         {/* Course Card */}
-        <div className="relative w-full max-w-[1200px] mx-auto bg-white/5 border border-[#E7E7E8] rounded-2xl flex flex-row items-center p-8 gap-8 shadow-lg">
+  <div className="relative w-full max-w-full xl:max-w-[1200px] mx-auto bg-white/5 border border-[#E7E7E8] rounded-2xl flex flex-col md:flex-row items-center p-4 sm:p-6 md:p-8 gap-6 md:gap-8 shadow-lg">
           {/* Image Wrapper */}
-          <div className="w-[376px] h-[376px] rounded-xl overflow-hidden flex-shrink-0 relative bg-black/10">
+          <div className="w-full h-56 sm:h-72 md:w-[300px] md:h-[300px] lg:w-[376px] lg:h-[376px] rounded-xl overflow-hidden flex-shrink-0 relative bg-black/10 mb-4 md:mb-0">
            <img src={htmlCssJsImg} alt="HTML CSS JS Course" className="w-full h-full object-cover" />
             
           </div>
           {/* Card Body */}
-          <div className="flex-1 flex flex-col justify-between h-full py-2">
+          <div className="flex-1 flex flex-col justify-between h-full py-2 min-w-0">
             {/* Badge Block */}
             <div className="flex items-center gap-4 mb-4">
               <span className="bg-[#F0F0F0] text-[#011813] font-outfit font-medium px-4 py-2 rounded-lg text-base">
@@ -112,12 +112,12 @@ export default function CourseSection() {
         </div>
       </div>
       {/* Course Cards Grid Section */}
-      <div className="w-full flex flex-col items-center mt-16">
+  <div className="w-full flex flex-col items-center mt-8 md:mt-12 lg:mt-16">
         <h2 className="font-outfit font-semibold text-4xl md:text-5xl text-[#011813] text-center mb-8">
           Explore Our All Courses
         </h2>
         {/* Category Tabs */}
-        <div className="flex flex-wrap gap-4 justify-center mb-10">
+  <div className="flex flex-wrap gap-2 sm:gap-3 md:gap-4 justify-center mb-6 md:mb-10">
           <button className="flex items-center bg-[#009D77] text-white font-outfit font-medium px-6 py-3 rounded-full border border-[#009D77]">
             All Categories
           </button>
@@ -138,9 +138,9 @@ export default function CourseSection() {
           </button>
         </div>
         {/* Cards Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-[1200px] mx-auto mb-12">
+  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 max-w-full xl:max-w-[1200px] mx-auto mb-8 md:mb-12">
           {/* Card 1 */}
-          <div className="bg-white rounded-xl shadow-md p-4 flex flex-col">
+          <div className="bg-white rounded-xl shadow-md p-3 sm:p-4 flex flex-col">
            <img src={htmlCssJsImg} alt="HTML CSS JS Course" className="w-full h-48 object-cover rounded-lg mb-4" />
             <div className="flex items-center justify-between mb-2">
               <span className="px-4 py-2 rounded-lg text-base font-outfit font-medium bg-[#F0F0F0] text-[#011813]">Project Management</span>
