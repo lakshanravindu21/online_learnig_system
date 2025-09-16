@@ -197,7 +197,7 @@ export default function AdminCourse() {
                 </tr>
               </thead>
               <tbody>
-                {courses.map((c) => (
+                {courses.map((c, idx) => (
                   <tr key={c.id} className="border-b last:border-0">
                     <td className="py-3 px-4 text-gray-500">{c.id}</td>
                     <td className="py-3 px-4 font-medium text-gray-900">{c.title}</td>
@@ -206,15 +206,25 @@ export default function AdminCourse() {
                     <td className="py-3 px-4 text-gray-500">{c.price}</td>
                     <td className="py-3 px-4 text-gray-500">{c.enrolled}</td>
                     <td className="py-3 px-4">
-                      {c.status === "Active" && (
-                        <span className="bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-semibold">Active</span>
-                      )}
-                      {c.status === "Pending" && (
-                        <span className="bg-yellow-100 text-yellow-700 px-3 py-1 rounded-full text-xs font-semibold">Pending</span>
-                      )}
-                      {c.status === "Draft" && (
-                        <span className="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-xs font-semibold">Draft</span>
-                      )}
+                      <select
+                        value={c.status}
+                        onChange={e => {
+                          const newStatus = e.target.value;
+                          setCourses(prev => prev.map((course, i) => i === idx ? { ...course, status: newStatus } : course));
+                        }}
+                        className={
+                          "rounded-full px-3 py-1 text-xs font-semibold " +
+                          (c.status === "Active"
+                            ? "bg-green-100 text-green-700"
+                            : c.status === "Pending"
+                            ? "bg-yellow-100 text-yellow-700"
+                            : "bg-blue-100 text-blue-700")
+                        }
+                      >
+                        <option value="Active">Active</option>
+                        <option value="Pending">Pending</option>
+                        <option value="Draft">Draft</option>
+                      </select>
                     </td>
                   </tr>
                 ))}
