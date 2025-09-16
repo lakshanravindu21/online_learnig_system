@@ -6,6 +6,7 @@ import FAQ from './pages/FAQ';
 import AdminDashboard from './pages/AdminDashboard';
 import Home from './pages/Home'; // Import Home
 import CourseSection from './pages/course';
+import AdminCourse from './pages/AdminCourse';
 
 const App = () => {
   return (
@@ -18,6 +19,7 @@ const App = () => {
           <Route path="/faq" element={<FAQ />} />
           <Route path="/admin/dashboard" element={<AdminDashboard />} />
            <Route path="/courses" element={<CourseSection />} />
+          <Route path="/admin/courses" element={<AdminCourse />} />
         </Routes>
       </div>
     </BrowserRouter>
