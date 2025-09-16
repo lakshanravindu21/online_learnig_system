@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { BookOpen, Users, UserCheck, DollarSign, BarChart3 } from "lucide-react";
+import { BookOpen, Users, UserCheck, DollarSign, BarChart3, Bell } from "lucide-react";
 
 const initialCourses = [
   {
@@ -136,7 +136,7 @@ export default function AdminCourse() {
         <header className="h-16 bg-white border-b border-gray-100 flex items-center justify-end px-8">
           <button className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center mr-4">
             <span className="sr-only">Notifications</span>
-            <svg width="24" height="24" fill="none" className="text-gray-500"><circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2"/></svg>
+            <Bell size={24} className="text-gray-500" />
           </button>
           <img src="https://randomuser.me/api/portraits/women/44.jpg" alt="Profile" className="w-10 h-10 rounded-full object-cover" />
         </header>
