@@ -1,3 +1,4 @@
+import TeamSection from "../components/teamsection";
 import React from "react";
 import { ArrowUpRight } from "lucide-react";
 import Header from "../components/Header";
@@ -263,6 +264,8 @@ export default function CourseSection() {
           </button>
         </div>
       </div>
+      
+      <TeamSection />
     </section>
     </>
   );
