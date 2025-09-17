@@ -11,6 +11,7 @@ import designSystemsImg from "../assets/design-systems-course.png";
 import digitalMarketingImg from "../assets/digital-marketing-course.png";
 import htmlcssbeyondcourse from "../assets/html-css-beyond-course.png";
 import uiuxessentialscourse from "../assets/uiux-essentials-course.png";
+import Footer from "../components/Footer";
 export default function CourseSection() {
   return (
     <>
@@ -266,6 +267,7 @@ export default function CourseSection() {
       </div>
       
       <TeamSection />
+      <Footer />
     </section>
     </>
   );

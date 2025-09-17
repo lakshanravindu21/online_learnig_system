@@ -4,6 +4,7 @@ import matthewRyanImg from "../assets/matthew-ryan.png";
 import danieljosephImg from "../assets/daniel-joseph.png";
 import jamesmichaelImg from "../assets/james-michael.png";
 import adambennettImg from "../assets/adam-bennett.png";
+
 const mentors = [
   {
     name: "Matthew Ryan",
@@ -76,6 +77,8 @@ export default function TeamSection() {
           </div>
         ))}
       </div>
+  
     </section>
+    
   );
 }
