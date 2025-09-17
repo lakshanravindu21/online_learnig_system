@@ -50,7 +50,7 @@ export default function SignIn() {
   return (
     <div className="min-h-screen bg-gradient-to-r from-[#e0f7fa] via-[#f0f8ff] to-[#fff0f5] flex items-center justify-center p-4">
       <div className="flex flex-col lg:flex-row items-center w-full max-w-6xl bg-white rounded-3xl shadow-xl overflow-hidden">
-        
+
         {/* Left - Form */}
         <div className="w-full lg:w-1/2 p-10">
           <h1 className="text-3xl font-bold text-gray-900 mb-3">Sign in</h1>

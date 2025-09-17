@@ -10,7 +10,8 @@ import AdminCourse from './pages/AdminCourse';
 import { auth } from "./firebase";
 import { onAuthStateChanged } from "firebase/auth";
 import SignIn from "./pages/SignIn";
-import SignUp from "./pages/SignUp"
+import SignUp from "./pages/SignUp";
+import ManageStudents from './pages/ManageStudents';
 
 // 🔹 Protected Route wrapper
 function PrivateRoute({ user, children }) {
@@ -75,6 +76,7 @@ const App = () => {
               </PrivateRoute>
             }
           />
+          <Route path="/admin/students" element={<ManageStudents />} />
         </Routes>
       </div>
     </BrowserRouter>
