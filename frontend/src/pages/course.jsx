@@ -16,7 +16,7 @@ export default function CourseSection() {
   return (
     <>
       <Header />
-    <section className="relative w-full min-h-screen bg-gradient-to-r from-[#d6f1f6] to-[#f6d6f3]flex flex-col items-center py-8 md:py-12 lg:py-16">
+    <section className="relative w-full min-h-screen bg-gradient-to-r from-[#d6f1f6] to-[#f6d6f3] flex flex-col items-center pt-8 md:pt-12 lg:pt-16">
       {/* Container */}
   <div className="relative w-full max-w-[95vw] xl:max-w-[1240px] mx-auto px-2 sm:px-4 md:px-6 lg:px-8">
         {/* Breadcrumb */}
