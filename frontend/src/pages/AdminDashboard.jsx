@@ -4,11 +4,12 @@ import {
   UserCheck,
   BookOpen,
   DollarSign,
-  Menu,
+ 
   BarChart3,
-  TrendingUp
+ 
 } from 'lucide-react';
 import AdminHeader from '../components/AdminHeader';
+import Sidebar from '../components/SidebarComponent';
 
 const AdminDashboard = () => {
   // Sample data for charts
@@ -43,33 +44,7 @@ const AdminDashboard = () => {
     <div className="min-h-screen bg-gray-50">
       <AdminHeader />
       <div className="flex flex-col lg:flex-row">
-        {/* Sidebar */}
-        <div className="w-full lg:w-64 bg-white border-r border-gray-200 min-h-screen hidden lg:block">
-          <div className="p-6">
-            <nav className="space-y-2">
-              <div className="flex items-center gap-3 px-4 py-3 bg-red-50 text-red-600 rounded-lg font-medium">
-                <BarChart3 size={20} />
-                <span>Dashboard</span>
-              </div>
-              <div className="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-gray-50 rounded-lg cursor-pointer">
-                <Users size={20} />
-                <span>Students</span>
-              </div>
-              <div className="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-gray-50 rounded-lg cursor-pointer">
-                <UserCheck size={20} />
-                <span>Instructors</span>
-              </div>
-              <div className="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-gray-50 rounded-lg cursor-pointer">
-                <BookOpen size={20} />
-                <span>Courses</span>
-              </div>
-              <div className="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-gray-50 rounded-lg cursor-pointer">
-                <DollarSign size={20} />
-                <span>Revenue</span>
-              </div>
-            </nav>
-          </div>
-        </div>
+        <Sidebar />
 
         {/* Main Content */}
         <div className="flex-1 p-2 sm:p-4 lg:p-8">

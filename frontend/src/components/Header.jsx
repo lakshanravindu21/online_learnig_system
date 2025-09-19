@@ -1,9 +1,26 @@
-import React, { useState } from "react";
-import { NavLink } from "react-router-dom";
-import { Menu, X } from "lucide-react";
+import React, { useState, useEffect } from "react";
+import { NavLink, useNavigate } from "react-router-dom";
+import { Menu, X, LogOut } from "lucide-react";
 
 const Header = () => {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [userName, setUserName] = useState("User");
+  const navigate = useNavigate();
+
+  // Load user name from localStorage
+  useEffect(() => {
+    const userData = JSON.parse(localStorage.getItem("user"));
+    if (userData && userData.name) {
+      setUserName(userData.name);
+    }
+  }, []);
+
+  // Logout function
+  const handleLogout = () => {
+    localStorage.removeItem("user");
+    localStorage.removeItem("token");
+    navigate("/signin");
+  };
 
   const navLinkClass =
     "text-gray-800 hover:text-emerald-600 transition-colors duration-200 font-semibold px-3 md:px-4 text-base md:text-lg whitespace-nowrap";
@@ -30,7 +47,7 @@ const Header = () => {
           </span>
         </div>
 
-        {/* Desktop Nav centered and auto-scaled */}
+        {/* Desktop Nav centered */}
         <nav className="hidden lg:flex flex-1 justify-center gap-6 md:gap-8 lg:gap-10">
           <NavLink to="/" className={({ isActive }) => (isActive ? activeClass : navLinkClass)}>
             Home
@@ -47,6 +64,14 @@ const Header = () => {
           <NavLink to="/profile" className={({ isActive }) => (isActive ? activeClass : navLinkClass)}>
             Profile
           </NavLink>
+
+          {/* Logout link right after Profile */}
+          <button
+            onClick={handleLogout}
+            className="text-gray-800 hover:text-red-600 transition-colors duration-200 font-semibold px-3 md:px-4 text-base md:text-lg whitespace-nowrap flex items-center gap-1"
+          >
+            <LogOut size={16} /> Logout
+          </button>
         </nav>
 
         {/* CTA Button pinned far-right */}
@@ -130,8 +155,16 @@ const Header = () => {
               Profile
             </NavLink>
 
+            {/* Mobile Logout */}
+            <button
+              onClick={handleLogout}
+              className="flex items-center gap-2 w-full justify-center py-3 rounded-full bg-red-500 hover:bg-red-600 text-white font-bold transition-all duration-300 mt-2"
+            >
+              <LogOut size={16} /> Logout
+            </button>
+
             {/* Mobile CTA */}
-            <div className="w-full pt-6 mt-6 border-t-2 border-gray-300">
+            <div className="w-full pt-6 mt-4 border-t border-gray-300">
               <NavLink
                 to="/enroll"
                 className="flex items-center justify-center w-full border-2 border-gray-800 rounded-full px-6 md:px-8 py-4 md:py-5 text-gray-900 font-bold hover:shadow-2xl hover:scale-105 hover:border-emerald-600 transition-all duration-300 group text-lg shadow-lg"
