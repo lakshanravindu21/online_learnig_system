@@ -13,7 +13,7 @@ model User {
   id        Int      @id @default(autoincrement())
   name      String
   email     String   @unique
-  password  String
+  password  String?  // ✅ make optional for Google login
   role      String   // "student" | "instructor" | "admin"
   courses   Course[] @relation("CourseInstructor")
   enrollments Enrollment[]
@@ -43,3 +43,12 @@ model Enrollment {
   createdAt DateTime @default(now())
 }
 
+// ✅ New: Contact Messages
+model ContactMessage {
+  id          Int      @id @default(autoincrement())
+  fullName    String
+  phoneNumber String
+  email       String
+  message     String
+  createdAt   DateTime @default(now())
+}

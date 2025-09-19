@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import contactImage from '../assets/contact_image.jpg';
-import FAQ from './FAQ'; // ✅ Import FAQ.jsx
-import Header from '../components/Header'; // ✅ Import Header
-import Footer from '../components/Footer'; // ✅ Import Footer
+import FAQ from './FAQ';
+import Header from '../components/Header';
+import Footer from '../components/Footer';
 
 const ContactUs = () => {
   const [formData, setFormData] = useState({
@@ -12,6 +12,31 @@ const ContactUs = () => {
     message: ''
   });
 
+  const [status, setStatus] = useState({ type: '', message: '' });
+  const [isUserLoggedIn, setIsUserLoggedIn] = useState(false);
+
+  // ✅ Auto-fill logged-in user's email + name
+  useEffect(() => {
+    const storedUser = localStorage.getItem("user");
+    if (storedUser) {
+      const parsedUser = JSON.parse(storedUser);
+      setFormData(prev => ({
+        ...prev,
+        emailAddress: parsedUser.email || prev.emailAddress,
+        fullName: parsedUser.name || prev.fullName
+      }));
+      setIsUserLoggedIn(true); // mark as logged in
+    }
+  }, []);
+
+  // ✅ Auto-hide status after 2 seconds
+  useEffect(() => {
+    if (status.message) {
+      const timer = setTimeout(() => setStatus({ type: '', message: '' }), 2000);
+      return () => clearTimeout(timer);
+    }
+  }, [status]);
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData(prevState => ({
@@ -20,10 +45,35 @@ const ContactUs = () => {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log('Form submitted:', formData);
-    // TODO: connect with backend/email API later
+    setStatus({ type: '', message: '' });
+
+    try {
+      const res = await fetch("http://localhost:5000/api/contact", {
+        method: "POST",
+        headers: { 
+          "Content-Type": "application/json", 
+          "Authorization": `Bearer ${localStorage.getItem("token")}` 
+        },
+        body: JSON.stringify(formData)
+      });
+
+      const data = await res.json();
+      if (res.ok) {
+        setStatus({ type: 'success', message: data.message || "Message sent successfully ✅" });
+        setFormData(prev => ({
+          ...prev,
+          phoneNumber: '',
+          message: ''
+        }));
+      } else {
+        setStatus({ type: 'error', message: data.error || "Failed to send message ❌" });
+      }
+    } catch (err) {
+      console.error(err);
+      setStatus({ type: 'error', message: "Server error. Please try again later." });
+    }
   };
 
   return (
@@ -40,14 +90,26 @@ const ContactUs = () => {
 
         {/* Contact Container */}
         <div className="max-w-[1200px] mx-auto">
-          <div className="grid md:grid-cols-2 gap-16 md:gap-16 items-center mb-20">
+          <div className="grid md:grid-cols-2 gap-16 items-center mb-20">
             {/* Contact Form */}
-            <div className="pr-10 md:pr-10">
-              <h1 className="text-4xl md:text-5xl font-bold text-gray-900 leading-tight mb-10">
+            <div className="pr-10">
+              <h1 className="text-4xl md:text-5xl font-bold text-gray-900 leading-tight mb-6">
                 Have Any Questions!<br />Send a Message
               </h1>
 
+              {/* Status Message */}
+              {status.message && (
+                <div
+                  className={`p-4 mb-4 rounded-lg text-white ${
+                    status.type === 'success' ? 'bg-green-500' : 'bg-red-500'
+                  }`}
+                >
+                  {status.message}
+                </div>
+              )}
+
               <form className="flex flex-col gap-6" onSubmit={handleSubmit}>
+                {/* Full Name */}
                 <div className="flex flex-col">
                   <label htmlFor="fullName" className="text-base font-medium text-gray-800 mb-2">Full Name</label>
                   <input
@@ -57,10 +119,12 @@ const ContactUs = () => {
                     value={formData.fullName}
                     onChange={handleInputChange}
                     required
-                    className="p-4 border-2 border-gray-200 rounded-lg text-base focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white"
+                    readOnly={isUserLoggedIn}
+                    className={`p-4 border-2 border-gray-200 rounded-lg text-base focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white ${isUserLoggedIn ? 'bg-gray-100 cursor-not-allowed' : ''}`}
                   />
                 </div>
 
+                {/* Phone Number */}
                 <div className="flex flex-col">
                   <label htmlFor="phoneNumber" className="text-base font-medium text-gray-800 mb-2">Phone Number</label>
                   <input
@@ -70,10 +134,11 @@ const ContactUs = () => {
                     value={formData.phoneNumber}
                     onChange={handleInputChange}
                     required
-                    className="p-4 border-2 border-gray-200 rounded-lg text-base focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white"
+                    className="p-4 border-2 border-gray-200 rounded-lg text-base focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white"
                   />
                 </div>
 
+                {/* Email Address */}
                 <div className="flex flex-col">
                   <label htmlFor="emailAddress" className="text-base font-medium text-gray-800 mb-2">Email Address</label>
                   <input
@@ -83,10 +148,12 @@ const ContactUs = () => {
                     value={formData.emailAddress}
                     onChange={handleInputChange}
                     required
-                    className="p-4 border-2 border-gray-200 rounded-lg text-base focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white"
+                    readOnly={isUserLoggedIn}
+                    className={`p-4 border-2 border-gray-200 rounded-lg text-base focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white ${isUserLoggedIn ? 'bg-gray-100 cursor-not-allowed' : ''}`}
                   />
                 </div>
 
+                {/* Message */}
                 <div className="flex flex-col">
                   <label htmlFor="message" className="text-base font-medium text-gray-800 mb-2">Message</label>
                   <textarea
@@ -96,10 +163,11 @@ const ContactUs = () => {
                     onChange={handleInputChange}
                     rows="5"
                     required
-                    className="p-4 border-2 border-gray-200 rounded-lg text-base focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white resize-y min-h-[120px]"
+                    className="p-4 border-2 border-gray-200 rounded-lg text-base focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white resize-y min-h-[120px]"
                   ></textarea>
                 </div>
 
+                {/* Submit Button */}
                 <button
                   type="submit"
                   className="flex items-center border-2 border-gray-800 rounded-full px-8 py-3 text-gray-900 font-bold text-lg hover:shadow-2xl hover:scale-105 hover:border-emerald-600 hover:bg-white/30 transition-all duration-300 group self-start mt-4"
@@ -121,8 +189,7 @@ const ContactUs = () => {
             </div>
 
             {/* Contact Image */}
-            <div className="relative flex justify-center items-start mt-[-40px] group"> 
-              {/* Hover effect on image */}
+            <div className="relative flex justify-center items-start mt-[-40px] group">
               <img
                 src={contactImage}
                 alt="Customer service representative"
@@ -133,7 +200,7 @@ const ContactUs = () => {
         </div>
 
         {/* Contact Info Section */}
-        <div className="w-full bg-pink-50 py-24">  
+        <div className="w-full bg-pink-50 py-24">
           <div className="max-w-[1200px] mx-auto px-6">
             <div className="grid md:grid-cols-3 gap-10">
               {/* Phone Card */}
