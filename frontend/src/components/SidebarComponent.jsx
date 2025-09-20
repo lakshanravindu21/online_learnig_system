@@ -1,6 +1,17 @@
-import React from "react";
-import { NavLink } from "react-router-dom";
+import React from "react"; 
+import { NavLink, Routes, Route, Navigate } from "react-router-dom";
 import { Users, BookOpen, DollarSign, BarChart3 } from "lucide-react";
+
+// ✅ Import pages
+import AdminDashboard from "../pages/AdminDashboard";
+import ManageStudents from "../pages/ManageStudents";
+import ManageInstructors from "../pages/ManageInstructors"; // ✅ Corrected import
+import CourseManagementDashboard from "../pages/CourseManagementDashboard";
+
+// ✅ Temporary placeholder for Revenue
+const RevenuePage = () => (
+  <h2 className="text-xl font-bold">Revenue Page (Coming Soon)</h2>
+);
 
 const SidebarComponent = () => {
   const linkClasses =
@@ -15,7 +26,7 @@ const SidebarComponent = () => {
         <div className="p-6">
           <nav className="space-y-1">
             <NavLink
-              to="/AdminDashboard"
+              to="/admin/dashboard"
               end
               className={({ isActive }) =>
                 `${linkClasses} ${isActive ? activeClasses : inactiveClasses}`
@@ -26,7 +37,7 @@ const SidebarComponent = () => {
             </NavLink>
 
             <NavLink
-              to="/students"
+              to="/admin/students"
               className={({ isActive }) =>
                 `${linkClasses} ${isActive ? activeClasses : inactiveClasses}`
               }
@@ -36,7 +47,7 @@ const SidebarComponent = () => {
             </NavLink>
 
             <NavLink
-              to="/instructors"
+              to="/admin/instructors"
               className={({ isActive }) =>
                 `${linkClasses} ${isActive ? activeClasses : inactiveClasses}`
               }
@@ -46,7 +57,7 @@ const SidebarComponent = () => {
             </NavLink>
 
             <NavLink
-              to="/CourseManagementDashboard"
+              to="/admin/courses"
               className={({ isActive }) =>
                 `${linkClasses} ${isActive ? activeClasses : inactiveClasses}`
               }
@@ -56,7 +67,7 @@ const SidebarComponent = () => {
             </NavLink>
 
             <NavLink
-              to="/revenue"
+              to="/admin/revenue"
               className={({ isActive }) =>
                 `${linkClasses} ${isActive ? activeClasses : inactiveClasses}`
               }
@@ -66,6 +77,20 @@ const SidebarComponent = () => {
             </NavLink>
           </nav>
         </div>
+      </div>
+
+      {/* ✅ Main Content Area */}
+      <div className="flex-1 p-6">
+        <Routes>
+          <Route path="/admin/dashboard" element={<AdminDashboard />} />
+          <Route path="/admin/students" element={<ManageStudents />} />
+          <Route path="/admin/courses" element={<CourseManagementDashboard />} />
+          <Route path="/admin/instructors" element={<ManageInstructors />} /> {/* ✅ Works now */}
+          <Route path="/admin/revenue" element={<RevenuePage />} />
+
+          {/* Default redirect /admin → /admin/dashboard */}
+          <Route path="/admin" element={<Navigate to="/admin/dashboard" replace />} />
+        </Routes>
       </div>
     </div>
   );

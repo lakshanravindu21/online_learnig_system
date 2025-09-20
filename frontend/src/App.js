@@ -12,6 +12,11 @@ import AdminCourse from './pages/AdminCourse';
 import SignIn from "./pages/SignIn";
 import SignUp from "./pages/SignUp";
 import ManageStudents from './pages/ManageStudents';
+import CourseManagementDashboard from './pages/CourseManagementDashboard';
+import ManageInstructors from './pages/ManageInstructors'; // ✅ Added
+
+// 🔹 Components
+import SidebarComponent from './components/SidebarComponent';
 
 // 🔹 Config
 import { API_BASE } from "./config";
@@ -94,7 +99,23 @@ const App = () => {
             }
           />
 
-          {/* Admin routes */}
+          {/* Admin routes (now handled by SidebarComponent) */}
+          <Route
+            path="/admin/*"
+            element={
+              <ProtectedRoute user={user} role="admin">
+                <SidebarComponent />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* 🔹 Redirect /admin root to /admin/dashboard */}
+          <Route
+            path="/admin"
+            element={<Navigate to="/admin/dashboard" replace />}
+          />
+
+          {/* Legacy admin routes (still accessible directly if needed) */}
           <Route
             path="/admin/dashboard"
             element={
@@ -119,13 +140,33 @@ const App = () => {
               </ProtectedRoute>
             }
           />
+          <Route
+            path="/admin/course-management"
+            element={
+              <ProtectedRoute user={user} role="admin">
+                <CourseManagementDashboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/instructors" // ✅ Added missing route
+            element={
+              <ProtectedRoute user={user} role="admin">
+                <ManageInstructors />
+              </ProtectedRoute>
+            }
+          />
 
           {/* Catch-all route: redirect based on login and role */}
           <Route
             path="*"
             element={
               user ? (
-                user.role === "admin" ? <Navigate to="/admin/dashboard" replace /> : <Navigate to="/" replace />
+                user.role === "admin" ? (
+                  <Navigate to="/admin/dashboard" replace />
+                ) : (
+                  <Navigate to="/" replace />
+                )
               ) : (
                 <Navigate to="/signin" replace />
               )
