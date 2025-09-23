@@ -13,6 +13,9 @@ const prisma = new PrismaClient();
 app.use(cors());
 app.use(express.json());
 
+// ✅ Static serving for uploaded files (thumbnails, content, etc.)
+app.use("/uploads", express.static("uploads"));
+
 // Root
 app.get("/", (req, res) => {
   res.send("Backend is running ✅");
@@ -353,6 +356,13 @@ app.delete("/api/instructors/:id", authenticateToken, requireAdmin, async (req, 
     res.status(500).json({ error: "Failed to delete instructor" });
   }
 });
+
+// ==================================================
+// 🔹 Mount courseRoutes (⚡ now public for testing)
+// ==================================================
+const courseRoutes = require("./routes/courseRoutes");
+// ❌ removed authenticateToken + requireAdmin for now
+app.use("/api/courses", courseRoutes);
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
