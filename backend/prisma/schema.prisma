@@ -4,8 +4,7 @@ generator client {
 }
 
 datasource db {
-  // Change to "postgresql" or "mysql" in production
-  provider = "sqlite"
+  provider = "sqlite" // Change to "postgresql" or "mysql" in production
   url      = env("DATABASE_URL")
 }
 
@@ -15,9 +14,9 @@ model User {
   email    String  @unique
   password String? // optional for Google login
   role     String  // "student" | "instructor" | "admin"
-  contact  String? // ✅ NEW: student/instructor contact number
-  status   String? @default("Active") // Active / Inactive
-  rating   Float?  // <-- NEW: rating for instructors
+  contact  String? 
+  status   String? @default("Active") 
+  rating   Float?  
 
   // Relations
   courses     Course[]         @relation("CourseInstructor")
@@ -40,8 +39,13 @@ model Course {
   instructor    User             @relation("CourseInstructor", fields: [instructorId], references: [id])
   thumbnailUrl  String?
   contentUrl    String?
-  enrolledCount Int              @default(0) // ✅ store initial enrolled count
+  enrolledCount Int              @default(0) 
   status        CourseStatus     @default(ACTIVE)
+
+  // ✅ NEW FIELDS
+  duration      String?          // Example: "4hr 35min"
+  lectures      Int?             // Example: 30
+
   createdAt     DateTime         @default(now())
   updatedAt     DateTime         @updatedAt
 

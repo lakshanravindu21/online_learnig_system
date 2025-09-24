@@ -4,13 +4,13 @@ const { addCourse, getCourses, updateCourse, deleteCourse } = require("../contro
 
 const router = express.Router();
 
-// Add new course (thumbnail + content)
+// Add new course (thumbnail + content + duration + lectures)
 router.post("/", upload, addCourse);
 
 // Get all courses
 router.get("/", getCourses);
 
-// Update course (optional new thumbnail/content)
+// Update course (optional new thumbnail/content + duration + lectures)
 router.put("/:id", upload, updateCourse);
 
 // Delete course

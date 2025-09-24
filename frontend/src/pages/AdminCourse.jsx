@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { X } from "lucide-react";
+import { X, Edit3, Trash2, PlusCircle } from "lucide-react";
 import axios from "axios";
 import AdminHeader from "../components/AdminHeader";
 import Sidebar from "../components/SidebarComponent";
@@ -20,6 +20,7 @@ const categories = [
 export default function AdminCourse() {
   const [courses, setCourses] = useState([]);
   const [showModal, setShowModal] = useState(false);
+  const [editingCourse, setEditingCourse] = useState(null);
   const [form, setForm] = useState({
     title: "",
     instructorId: "",
@@ -28,6 +29,8 @@ export default function AdminCourse() {
     price: "",
     enrolledCount: "",
     status: "ACTIVE",
+    duration: "",
+    lectures: "",
   });
   const [thumbnailFile, setThumbnailFile] = useState(null);
   const [contentFile, setContentFile] = useState(null);
@@ -57,9 +60,43 @@ export default function AdminCourse() {
     fetchCourses();
   }, []);
 
-  const handleOpenModal = () => setShowModal(true);
+  const handleOpenModal = (course = null) => {
+    if (course) {
+      setEditingCourse(course);
+      setForm({
+        title: course.title,
+        instructorId: course.instructorId,
+        categoryId: course.categoryId,
+        description: course.description,
+        price: course.price,
+        enrolledCount: course.enrolledCount,
+        status: course.status,
+        duration: course.duration || "",
+        lectures: course.lectures ?? "",
+      });
+    } else {
+      setEditingCourse(null);
+      setForm({
+        title: "",
+        instructorId: "",
+        categoryId: "",
+        description: "",
+        price: "",
+        enrolledCount: "",
+        status: "ACTIVE",
+        duration: "",
+        lectures: "",
+      });
+    }
+    setThumbnailFile(null);
+    setContentFile(null);
+    setMessage({ text: "", type: "" });
+    setShowModal(true);
+  };
+
   const handleCloseModal = () => {
     setShowModal(false);
+    setEditingCourse(null);
     setForm({
       title: "",
       instructorId: "",
@@ -68,6 +105,8 @@ export default function AdminCourse() {
       price: "",
       enrolledCount: "",
       status: "ACTIVE",
+      duration: "",
+      lectures: "",
     });
     setThumbnailFile(null);
     setContentFile(null);
@@ -91,7 +130,7 @@ export default function AdminCourse() {
 
   const showTempMessage = (text, type) => {
     setMessage({ text, type });
-    setTimeout(() => setMessage({ text: "", type: "" }), 2000);
+    setTimeout(() => setMessage({ text: "", type: "" }), 2500);
   };
 
   const handleSubmit = async (e) => {
@@ -111,107 +150,129 @@ export default function AdminCourse() {
     formData.append("instructorId", parseInt(form.instructorId));
     formData.append("enrolledCount", form.enrolledCount ? parseInt(form.enrolledCount) : 0);
 
+    if (form.duration) formData.append("duration", form.duration);
+    if (form.lectures) formData.append("lectures", parseInt(form.lectures));
     if (thumbnailFile) formData.append("thumbnailUrl", thumbnailFile);
     if (contentFile) formData.append("contentUrl", contentFile);
 
     try {
       setLoading(true);
-      await api.post("/courses", formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      if (editingCourse) {
+        await api.put(`/courses/${editingCourse.id}`, formData, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        showTempMessage("Course updated successfully!", "success");
+      } else {
+        await api.post("/courses", formData, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        showTempMessage("Course added successfully!", "success");
+      }
       setLoading(false);
       fetchCourses();
       handleCloseModal();
-      showTempMessage("Course added successfully!", "success");
     } catch (err) {
       setLoading(false);
       console.error("Error submitting course:", err.response?.data || err.message);
-      showTempMessage(err.response?.data?.error || "Failed to add course.", "error");
+      showTempMessage(err.response?.data?.error || "Failed to save course.", "error");
+    }
+  };
+
+  const handleDelete = async (id) => {
+    if (!token) return;
+    if (!window.confirm("Are you sure you want to delete this course?")) return;
+
+    try {
+      await api.delete(`/courses/${id}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      fetchCourses();
+      showTempMessage("Course deleted successfully!", "success");
+    } catch (err) {
+      console.error("Error deleting course:", err.response?.data || err.message);
+      showTempMessage("Failed to delete course.", "error");
     }
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-100">
       <AdminHeader />
       <div className="flex flex-col lg:flex-row">
         <Sidebar />
-        <div className="flex-1 p-2 sm:p-4 lg:p-8">
-          <div className="flex items-center justify-between mb-6">
-            <h1 className="text-3xl font-bold text-gray-900">Manage Courses</h1>
-            <button
-              className="flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white font-bold px-6 py-3 rounded-md shadow transition"
-              onClick={handleOpenModal}
-            >
-              <span className="text-xl">+</span> Add New Course
-            </button>
-          </div>
-
+        <div className="flex-1 p-4 lg:p-8">
           {/* Global messages */}
           {message.text && (
             <div
-              className={`mb-4 px-4 py-3 rounded-lg text-white font-medium transition-all duration-300 ${
-                message.type === "success" ? "bg-green-500" : "bg-red-500"
+              className={`mb-6 px-5 py-3 rounded-lg font-medium text-center shadow transition-all ${
+                message.type === "success" ? "bg-green-500 text-white" : "bg-red-500 text-white"
               }`}
             >
               {message.text}
             </div>
           )}
 
-          {/* Add Course Modal */}
+          <div className="flex items-center justify-between mb-8">
+            <h1 className="text-3xl font-bold text-gray-800">Manage Courses</h1>
+            <button
+              className="flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white px-5 py-3 rounded-lg shadow-lg transition"
+              onClick={() => handleOpenModal(null)}
+            >
+              <PlusCircle size={20} /> Add New Course
+            </button>
+          </div>
+
+          {/* Modal */}
           {showModal && (
             <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4">
               <div className="bg-white rounded-xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto">
-                <div className="flex items-center justify-between p-6 border-b border-gray-200">
-                  <h2 className="text-2xl font-bold text-gray-900">Add New Course</h2>
+                <div className="flex items-center justify-between p-6 border-b">
+                  <h2 className="text-2xl font-bold">
+                    {editingCourse ? "Edit Course" : "Add New Course"}
+                  </h2>
                   <button
                     className="p-2 hover:bg-gray-100 rounded-full transition"
                     onClick={handleCloseModal}
                   >
-                    <X size={24} className="text-gray-500" />
+                    <X size={22} className="text-gray-600" />
                   </button>
                 </div>
+                {/* form kept same */}
                 <div className="p-6">
-                  {message.text && message.type === "error" && (
-                    <p className="text-red-600 font-medium mb-4">{message.text}</p>
-                  )}
                   <form
                     onSubmit={handleSubmit}
                     className="grid grid-cols-1 lg:grid-cols-2 gap-6"
                   >
-                    {/* Left Column */}
+                    {/* left column */}
                     <div className="space-y-6">
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Title
-                        </label>
+                        <label className="block mb-2 font-medium">Title</label>
                         <input
                           name="title"
                           value={form.title}
                           onChange={handleChange}
                           required
-                          className="w-full border border-gray-300 rounded-lg px-4 py-3"
+                          className="w-full border rounded-lg px-4 py-3"
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Description
-                        </label>
+                        <label className="block mb-2 font-medium">Description</label>
                         <textarea
                           name="description"
                           value={form.description}
                           onChange={handleChange}
                           required
                           rows={4}
-                          className="w-full border border-gray-300 rounded-lg px-4 py-3 resize-none"
+                          className="w-full border rounded-lg px-4 py-3 resize-none"
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Price
-                        </label>
+                        <label className="block mb-2 font-medium">Price</label>
                         <input
                           name="price"
                           type="number"
@@ -219,34 +280,37 @@ export default function AdminCourse() {
                           value={form.price}
                           onChange={handleChange}
                           required
-                          className="w-full border border-gray-300 rounded-lg px-4 py-3"
+                          className="w-full border rounded-lg px-4 py-3"
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Upload Thumbnail
-                        </label>
+                        <label className="block mb-2 font-medium">Duration</label>
+                        <input
+                          name="duration"
+                          value={form.duration}
+                          onChange={handleChange}
+                          className="w-full border rounded-lg px-4 py-3"
+                        />
+                      </div>
+                      <div>
+                        <label className="block mb-2 font-medium">Upload Thumbnail</label>
                         <input type="file" accept="image/*" onChange={handleThumbnailUpload} />
                         {thumbnailFile && (
-                          <p className="text-sm text-green-600 mt-2">
-                            Selected: {thumbnailFile.name}
-                          </p>
+                          <p className="text-sm text-green-600 mt-2">{thumbnailFile.name}</p>
                         )}
                       </div>
                     </div>
 
-                    {/* Right Column */}
+                    {/* right column */}
                     <div className="space-y-6">
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Category
-                        </label>
+                        <label className="block mb-2 font-medium">Category</label>
                         <select
                           name="categoryId"
                           value={form.categoryId}
                           onChange={handleChange}
                           required
-                          className="w-full border border-gray-300 rounded-lg px-4 py-3"
+                          className="w-full border rounded-lg px-4 py-3"
                         >
                           <option value="">Select category</option>
                           {categories.map((cat) => (
@@ -257,51 +321,52 @@ export default function AdminCourse() {
                         </select>
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Instructor ID
-                        </label>
+                        <label className="block mb-2 font-medium">Instructor ID</label>
                         <input
                           name="instructorId"
                           type="number"
                           value={form.instructorId}
                           onChange={handleChange}
                           required
-                          className="w-full border border-gray-300 rounded-lg px-4 py-3"
+                          className="w-full border rounded-lg px-4 py-3"
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Initial Enrolled Count
-                        </label>
+                        <label className="block mb-2 font-medium">Enrolled Count</label>
                         <input
                           name="enrolledCount"
                           type="number"
                           min="0"
                           value={form.enrolledCount}
                           onChange={handleChange}
-                          className="w-full border border-gray-300 rounded-lg px-4 py-3"
+                          className="w-full border rounded-lg px-4 py-3"
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Upload Content
-                        </label>
+                        <label className="block mb-2 font-medium">Number of Lectures</label>
+                        <input
+                          name="lectures"
+                          type="number"
+                          min="0"
+                          value={form.lectures}
+                          onChange={handleChange}
+                          className="w-full border rounded-lg px-4 py-3"
+                        />
+                      </div>
+                      <div>
+                        <label className="block mb-2 font-medium">Upload Content</label>
                         <input type="file" accept=".pdf,.zip,.mp4" onChange={handleContentUpload} />
                         {contentFile && (
-                          <p className="text-sm text-green-600 mt-2">
-                            Selected: {contentFile.name}
-                          </p>
+                          <p className="text-sm text-green-600 mt-2">{contentFile.name}</p>
                         )}
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Status
-                        </label>
+                        <label className="block mb-2 font-medium">Status</label>
                         <select
                           name="status"
                           value={form.status}
                           onChange={handleChange}
-                          className="w-full border border-gray-300 rounded-lg px-4 py-3"
+                          className="w-full border rounded-lg px-4 py-3"
                         >
                           <option value="ACTIVE">Active</option>
                           <option value="PENDING">Pending</option>
@@ -315,7 +380,7 @@ export default function AdminCourse() {
                       <button
                         type="button"
                         onClick={handleCloseModal}
-                        className="px-6 py-3 border border-gray-300 rounded-lg text-gray-700 font-medium"
+                        className="px-6 py-3 border rounded-lg text-gray-600"
                       >
                         Cancel
                       </button>
@@ -324,7 +389,13 @@ export default function AdminCourse() {
                         className="px-8 py-3 bg-red-600 hover:bg-red-700 text-white font-bold rounded-lg"
                         disabled={loading}
                       >
-                        {loading ? "Adding..." : "Add Course"}
+                        {loading
+                          ? editingCourse
+                            ? "Updating..."
+                            : "Adding..."
+                          : editingCourse
+                          ? "Update Course"
+                          : "Add Course"}
                       </button>
                     </div>
                   </form>
@@ -333,25 +404,31 @@ export default function AdminCourse() {
             </div>
           )}
 
-          {/* Courses Table */}
+          {/* Table */}
           <div className="bg-white rounded-xl shadow p-6">
             <h2 className="text-lg font-bold mb-4">All Courses</h2>
             <div className="overflow-x-auto">
-              <table className="min-w-full text-sm">
-                <thead>
-                  <tr className="text-gray-500 font-semibold border-b">
+              <table className="min-w-full text-sm border rounded-lg overflow-hidden">
+                <thead className="bg-gray-100">
+                  <tr className="text-gray-600 border-b">
                     <th className="py-3 px-4 text-left">ID</th>
                     <th className="py-3 px-4 text-left">Title</th>
-                    <th className="py-3 px-4 text-left">Instructor ID</th>
+                    <th className="py-3 px-4 text-left">Instructor</th>
                     <th className="py-3 px-4 text-left">Category</th>
                     <th className="py-3 px-4 text-left">Price</th>
+                    <th className="py-3 px-4 text-left">Duration</th>
+                    <th className="py-3 px-4 text-left">Lectures</th>
                     <th className="py-3 px-4 text-left">Status</th>
+                    <th className="py-3 px-4 text-center">Actions</th>
                   </tr>
                 </thead>
                 <tbody>
                   {courses.length > 0 ? (
                     courses.map((c) => (
-                      <tr key={c.id} className="border-b last:border-0">
+                      <tr
+                        key={c.id}
+                        className="border-b hover:bg-gray-50 transition"
+                      >
                         <td className="py-3 px-4 text-gray-500">{c.id}</td>
                         <td className="py-3 px-4 font-medium">{c.title}</td>
                         <td className="py-3 px-4 text-gray-500">{c.instructorId}</td>
@@ -359,12 +436,30 @@ export default function AdminCourse() {
                           {categories.find((cat) => cat.id === c.categoryId)?.name || "N/A"}
                         </td>
                         <td className="py-3 px-4 text-gray-500">${c.price}</td>
+                        <td className="py-3 px-4 text-gray-500">{c.duration || "N/A"}</td>
+                        <td className="py-3 px-4 text-gray-500">{c.lectures ?? "N/A"}</td>
                         <td className="py-3 px-4 text-gray-500">{c.status}</td>
+                        <td className="py-3 px-4 flex items-center justify-center gap-3">
+                          <button
+                            onClick={() => handleOpenModal(c)}
+                            className="p-2 rounded-full bg-blue-100 hover:bg-blue-200 transition"
+                            title="Edit"
+                          >
+                            <Edit3 size={16} className="text-blue-600" />
+                          </button>
+                          <button
+                            onClick={() => handleDelete(c.id)}
+                            className="p-2 rounded-full bg-red-100 hover:bg-red-200 transition"
+                            title="Delete"
+                          >
+                            <Trash2 size={16} className="text-red-600" />
+                          </button>
+                        </td>
                       </tr>
                     ))
                   ) : (
                     <tr>
-                      <td colSpan="6" className="py-4 text-center text-gray-500">
+                      <td colSpan="9" className="py-6 text-center text-gray-500">
                         No courses found
                       </td>
                     </tr>

@@ -17,7 +17,17 @@ const removeFile = (filePath) => {
 // Add new course
 const addCourse = async (req, res) => {
   try {
-    const { title, description, price, categoryId, status, instructorId, enrolledCount } = req.body;
+    const {
+      title,
+      description,
+      price,
+      categoryId,
+      status,
+      instructorId,
+      enrolledCount,
+      duration,   // ✅ NEW FIELD
+      lectures    // ✅ NEW FIELD
+    } = req.body;
 
     // Check instructor exists
     const instructor = await prisma.user.findUnique({ where: { id: parseInt(instructorId) } });
@@ -42,6 +52,8 @@ const addCourse = async (req, res) => {
         status,
         instructorId: parseInt(instructorId),
         enrolledCount: enrolledCount ? parseInt(enrolledCount) : 0,
+        duration: duration || null,                       // ✅ Added
+        lectures: lectures ? parseInt(lectures) : null,   // ✅ Added
         thumbnailUrl: thumbnailFile ? `/uploads/thumbnails/${thumbnailFile.filename}` : null,
         contentUrl: contentFile
           ? contentFile.mimetype.startsWith("video")
@@ -75,7 +87,17 @@ const getCourses = async (req, res) => {
 const updateCourse = async (req, res) => {
   try {
     const { id } = req.params;
-    const { title, description, price, categoryId, status, instructorId, enrolledCount } = req.body;
+    const {
+      title,
+      description,
+      price,
+      categoryId,
+      status,
+      instructorId,
+      enrolledCount,
+      duration,   // ✅ NEW FIELD
+      lectures    // ✅ NEW FIELD
+    } = req.body;
 
     const oldCourse = await prisma.course.findUnique({ where: { id: parseInt(id) } });
     if (!oldCourse) return res.status(404).json({ error: "Course not found" });
@@ -118,6 +140,8 @@ const updateCourse = async (req, res) => {
         status,
         instructorId: parseInt(instructorId),
         enrolledCount: enrolledCount ? parseInt(enrolledCount) : 0,
+        duration: duration || null,                       // ✅ Added
+        lectures: lectures ? parseInt(lectures) : null,   // ✅ Added
         thumbnailUrl,
         contentUrl,
       },
