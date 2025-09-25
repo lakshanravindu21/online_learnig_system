@@ -5,16 +5,11 @@ import AdminHeader from "../components/AdminHeader";
 import Sidebar from "../components/SidebarComponent";
 
 const categories = [
-  { id: 1, name: "Computer Science" },
-  { id: 2, name: "Mathematics" },
-  { id: 3, name: "Arts & Humanities" },
-  { id: 4, name: "Business" },
-  { id: 5, name: "Languages" },
-  { id: 6, name: "Data Science" },
-  { id: 7, name: "Design" },
-  { id: 8, name: "Engineering" },
-  { id: 9, name: "Health & Medicine" },
-  { id: 10, name: "Personal Development" },
+  { id: 1, name: "Development" },
+  { id: 2, name: "UI/UX Design" },
+  { id: 3, name: "Project Management" },
+  { id: 4, name: "Accounting" },
+  { id: 5, name: "Marketing" },
 ];
 
 export default function AdminCourse() {

@@ -4,16 +4,11 @@ const { PrismaClient } = require("../generated/prisma"); // Use your generated P
 const prisma = new PrismaClient();
 
 const categories = [
-  "Computer Science",
-  "Mathematics",
-  "Arts & Humanities",
-  "Business",
-  "Languages",
-  "Data Science",
-  "Design",
-  "Engineering",
-  "Health & Medicine",
-  "Personal Development",
+  "Development",
+  "UI/UX Design",
+  "Project Management",
+  "Accounting",
+  "Marketing",
 ];
 
 async function main() {
