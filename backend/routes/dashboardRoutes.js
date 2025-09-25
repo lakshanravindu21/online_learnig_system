@@ -1,26 +1,38 @@
-import express from "express";
-import { PrismaClient } from "@prisma/client";
-
-const prisma = new PrismaClient();
+const express = require("express");
 const router = express.Router();
+const prisma = require("../prismaClient"); // adjust path if needed
 
-// ✅ Admin stats endpoint
+// GET /api/dashboard/stats
 router.get("/stats", async (req, res) => {
   try {
-    const studentsCount = await prisma.user.count({ where: { role: "STUDENT" } });
-    const instructorsCount = await prisma.user.count({ where: { role: "instructor" } });
-    const coursesCount = await prisma.course.count();
+    // Total Students
+    const totalStudents = await prisma.user.count({ where: { role: "STUDENT" } });
+
+    // Total Instructors
+    const totalInstructors = await prisma.user.count({ where: { role: "instructor" } });
+
+    // Total Courses
+    const totalCourses = await prisma.course.count();
+
+    // Total Revenue = sum of (price * enrolledCount) for all courses
+    const courses = await prisma.course.findMany({
+      select: { price: true, enrolledCount: true },
+    });
+
+    const totalRevenue = courses.reduce((acc, course) => {
+      return acc + (course.price || 0) * (course.enrolledCount || 0);
+    }, 0);
 
     res.json({
-      students: studentsCount,
-      instructors: instructorsCount,
-      courses: coursesCount,
-      revenue: 50000, // 💡 Replace with real logic if you track payments
+      totalStudents,
+      totalInstructors,
+      totalCourses,
+      totalRevenue, // dynamically calculated
     });
   } catch (err) {
-    console.error("Error fetching dashboard stats:", err);
-    res.status(500).json({ error: "Failed to fetch stats" });
+    console.error(err);
+    res.status(500).json({ error: "Server error fetching stats" });
   }
 });
 
-export default router;
+module.exports = router;

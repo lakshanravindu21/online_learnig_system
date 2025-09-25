@@ -132,7 +132,7 @@ app.post("/api/contact", authenticateToken, async (req, res) => {
     const user = await prisma.user.findUnique({ where: { id: req.user.id }, select: { email: true, name: true } });
     if (!user) return res.status(404).json({ error: "User not found" });
 
-    const transporter = nodemailer.createTransport({
+    const transporter = nodemailer.createTransporter({
       host: "smtp.gmail.com",
       port: 465,
       secure: true,
@@ -172,10 +172,58 @@ app.get("/api/admin/dashboard", authenticateToken, requireAdmin, (req, res) => {
 });
 
 // ==================================================
+// 🔹 Dashboard stats route (UPDATED with revenue calculation)
+// ==================================================
+app.get("/api/dashboard/stats", authenticateToken, requireAdmin, async (req, res) => {
+  try {
+    console.log("Fetching dashboard stats..."); // Debug log
+    
+    // Count total students (checking multiple role variations)
+    const totalStudents = await prisma.user.count({ 
+      where: { 
+        OR: [
+          { role: "student" },
+          { role: "STUDENT" },
+          { role: "Student" }
+        ]
+      } 
+    });
+    
+    // Count total instructors (checking multiple role variations)
+    const totalInstructors = await prisma.user.count({ 
+      where: { 
+        OR: [
+          { role: "instructor" },
+          { role: "INSTRUCTOR" },
+          { role: "Instructor" }
+        ]
+      } 
+    });
+    
+    // Count total courses
+    const totalCourses = await prisma.course.count();
+
+    // Calculate total revenue dynamically (price * enrolledCount)
+    const courses = await prisma.course.findMany({
+      select: { price: true, enrolledCount: true },
+    });
+
+    const totalRevenue = courses.reduce((acc, course) => {
+      return acc + (course.price || 0) * (course.enrolledCount || 0);
+    }, 0);
+
+    console.log("Dashboard stats:", { totalStudents, totalInstructors, totalCourses, totalRevenue }); // Debug log
+
+    res.json({ totalStudents, totalInstructors, totalCourses, totalRevenue });
+  } catch (err) {
+    console.error("Error fetching dashboard stats:", err);
+    res.status(500).json({ error: "Failed to fetch dashboard stats" });
+  }
+});
+
+// ==================================================
 // 🔹 Student Management API (Admin Only)
 // ==================================================
-
-// ➕ Add new student
 app.post("/api/students", authenticateToken, requireAdmin, async (req, res) => {
   try {
     const { name, email, contact, status } = req.body;
@@ -187,7 +235,6 @@ app.post("/api/students", authenticateToken, requireAdmin, async (req, res) => {
   }
 });
 
-// 📜 Get all students
 app.get("/api/students", authenticateToken, requireAdmin, async (req, res) => {
   try {
     const students = await prisma.user.findMany({ where: { role: "student" }, orderBy: { createdAt: "desc" } });
@@ -198,7 +245,6 @@ app.get("/api/students", authenticateToken, requireAdmin, async (req, res) => {
   }
 });
 
-// 👀 Get single student
 app.get("/api/students/:id", authenticateToken, requireAdmin, async (req, res) => {
   try {
     const student = await prisma.user.findUnique({ where: { id: Number(req.params.id) } });
@@ -210,7 +256,6 @@ app.get("/api/students/:id", authenticateToken, requireAdmin, async (req, res) =
   }
 });
 
-// ✏️ Update student
 app.put("/api/students/:id", authenticateToken, requireAdmin, async (req, res) => {
   try {
     const { name, email, contact, status } = req.body;
@@ -222,7 +267,6 @@ app.put("/api/students/:id", authenticateToken, requireAdmin, async (req, res) =
   }
 });
 
-// ❌ Delete student
 app.delete("/api/students/:id", authenticateToken, requireAdmin, async (req, res) => {
   try {
     await prisma.user.delete({ where: { id: Number(req.params.id) } });
@@ -236,8 +280,6 @@ app.delete("/api/students/:id", authenticateToken, requireAdmin, async (req, res
 // ==================================================
 // 🔹 Instructor Management API (Admin Only)
 // ==================================================
-
-// ➕ Add new instructor
 app.post("/api/instructors", authenticateToken, requireAdmin, async (req, res) => {
   try {
     const { name, email, contact, status, rating } = req.body;
@@ -251,7 +293,7 @@ app.post("/api/instructors", authenticateToken, requireAdmin, async (req, res) =
         contact,
         status: status || "Active",
         role: "instructor",
-        rating: rating !== undefined ? parseFloat(rating) : 0, // ✅ convert to float
+        rating: rating !== undefined ? parseFloat(rating) : 0,
         password: null
       },
     });
@@ -263,7 +305,6 @@ app.post("/api/instructors", authenticateToken, requireAdmin, async (req, res) =
   }
 });
 
-// 📜 Get all instructors
 app.get("/api/instructors", authenticateToken, requireAdmin, async (req, res) => {
   try {
     const { status, search } = req.query;
@@ -301,7 +342,6 @@ app.get("/api/instructors", authenticateToken, requireAdmin, async (req, res) =>
   }
 });
 
-// 👀 Get single instructor
 app.get("/api/instructors/:id", authenticateToken, requireAdmin, async (req, res) => {
   try {
     const instructor = await prisma.user.findUnique({
@@ -325,7 +365,6 @@ app.get("/api/instructors/:id", authenticateToken, requireAdmin, async (req, res
   }
 });
 
-// ✏️ Update instructor
 app.put("/api/instructors/:id", authenticateToken, requireAdmin, async (req, res) => {
   try {
     const { name, email, contact, status, rating } = req.body;
@@ -336,7 +375,7 @@ app.put("/api/instructors/:id", authenticateToken, requireAdmin, async (req, res
         email,
         contact,
         status,
-        rating: rating !== undefined ? parseFloat(rating) : 0, // ✅ convert to float
+        rating: rating !== undefined ? parseFloat(rating) : 0,
       },
     });
     res.json(instructor);
@@ -346,7 +385,6 @@ app.put("/api/instructors/:id", authenticateToken, requireAdmin, async (req, res
   }
 });
 
-// ❌ Delete instructor
 app.delete("/api/instructors/:id", authenticateToken, requireAdmin, async (req, res) => {
   try {
     await prisma.user.delete({ where: { id: Number(req.params.id) } });

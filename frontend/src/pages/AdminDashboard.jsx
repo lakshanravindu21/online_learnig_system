@@ -1,26 +1,113 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react'; 
 import {
   Users,
   UserCheck,
   BookOpen,
   DollarSign,
- 
-  BarChart3,
- 
 } from 'lucide-react';
 import AdminHeader from '../components/AdminHeader';
 import Sidebar from '../components/SidebarComponent';
+import axios from 'axios';
+
+// ✅ Import Recharts
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  Tooltip,
+  ResponsiveContainer,
+  CartesianGrid,
+  BarChart,
+  Bar,
+} from 'recharts';
 
 const AdminDashboard = () => {
-  // Sample data for charts
-  const monthlyData = [
-    { month: 'Jan', value: 20 },
-    { month: 'Feb', value: 35 },
-    { month: 'Mar', value: 25 },
-    { month: 'Apr', value: 45 },
-    { month: 'May', value: 40 },
-    { month: 'Jun', value: 60 }
-  ];
+  const [stats, setStats] = useState({
+    totalStudents: 0,
+    totalInstructors: 0,
+    totalCourses: 0,
+    totalRevenue: 0,
+  });
+  
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  // ✅ Generate last 6 months dynamically
+  const getLast6Months = () => {
+    const months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+    const result = [];
+    const today = new Date();
+    for (let i = 5; i >= 0; i--) {
+      const d = new Date(today.getFullYear(), today.getMonth() - i, 1);
+      result.push(months[d.getMonth()]);
+    }
+    return result;
+  };
+
+  // ✅ Only put actual values into current month, others = 0
+  const generateMonthlyData = (total) => {
+    const months = getLast6Months();
+    const today = new Date();
+    const currentMonth = today.getMonth();
+
+    return months.map((month, i) => {
+      const isCurrentMonth = month === months[months.length - 1]; // last item = current month
+      return {
+        month,
+        value: isCurrentMonth ? total : 0
+      };
+    });
+  };
+
+  const monthlyRevenueData = generateMonthlyData(stats.totalRevenue / 1000); // Scale for better visualization
+  const monthlyStudentData = generateMonthlyData(stats.totalStudents);
+
+  // Fetch stats from backend
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        
+        const token = localStorage.getItem('token');
+        if (!token) {
+          throw new Error('No authentication token found');
+        }
+
+        console.log('Fetching dashboard stats...'); // Debug log
+        
+        const res = await axios.get('http://localhost:5000/api/dashboard/stats', {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        console.log('API Response:', res.data); // Debug log
+
+        const data = res.data;
+        setStats({
+          totalStudents: data.totalStudents ?? 0,
+          totalInstructors: data.totalInstructors ?? 0,
+          totalCourses: data.totalCourses ?? 0,
+          totalRevenue: data.totalRevenue ?? 0,
+        });
+        
+      } catch (error) {
+        console.error('Error fetching dashboard stats:', error);
+        setError(error.response?.data?.error || error.message || 'Failed to fetch stats');
+        
+        setStats({
+          totalStudents: 0,
+          totalInstructors: 0,
+          totalCourses: 0,
+          totalRevenue: 0,
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchStats();
+  }, []);
 
   const recentActivities = [
     {
@@ -48,8 +135,25 @@ const AdminDashboard = () => {
 
         {/* Main Content */}
         <div className="flex-1 p-2 sm:p-4 lg:p-8">
+          
+          {/* Error Message */}
+          {error && (
+            <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+              <strong>Error:</strong> {error}
+            </div>
+          )}
+
+          {/* Loading State */}
+          {loading && (
+            <div className="text-center py-8">
+              <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+              <p className="mt-2 text-gray-600">Loading dashboard stats...</p>
+            </div>
+          )}
+
           {/* Stats Cards */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-8">
+            {/* Total Students */}
             <div className="bg-white p-4 sm:p-6 rounded-xl shadow-sm border border-gray-100 transition-all duration-200 hover:shadow-lg hover:-translate-y-1 cursor-pointer">
               <div className="flex items-center gap-4">
                 <div className="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center">
@@ -57,11 +161,14 @@ const AdminDashboard = () => {
                 </div>
                 <div>
                   <p className="text-sm text-gray-600">Total Students</p>
-                  <p className="text-2xl font-bold text-gray-900">1,250</p>
+                  <p className="text-2xl font-bold text-gray-900">
+                    {loading ? '...' : stats.totalStudents}
+                  </p>
                 </div>
               </div>
             </div>
 
+            {/* Total Instructors */}
             <div className="bg-white p-4 sm:p-6 rounded-xl shadow-sm border border-gray-100 transition-all duration-200 hover:shadow-lg hover:-translate-y-1 cursor-pointer">
               <div className="flex items-center gap-4">
                 <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
@@ -69,11 +176,14 @@ const AdminDashboard = () => {
                 </div>
                 <div>
                   <p className="text-sm text-gray-600">Total Instructors</p>
-                  <p className="text-2xl font-bold text-gray-900">50</p>
+                  <p className="text-2xl font-bold text-gray-900">
+                    {loading ? '...' : stats.totalInstructors}
+                  </p>
                 </div>
               </div>
             </div>
 
+            {/* Total Courses */}
             <div className="bg-white p-4 sm:p-6 rounded-xl shadow-sm border border-gray-100 transition-all duration-200 hover:shadow-lg hover:-translate-y-1 cursor-pointer">
               <div className="flex items-center gap-4">
                 <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
@@ -81,11 +191,14 @@ const AdminDashboard = () => {
                 </div>
                 <div>
                   <p className="text-sm text-gray-600">Total Courses</p>
-                  <p className="text-2xl font-bold text-gray-900">200</p>
+                  <p className="text-2xl font-bold text-gray-900">
+                    {loading ? '...' : stats.totalCourses}
+                  </p>
                 </div>
               </div>
             </div>
 
+            {/* Total Revenue */}
             <div className="bg-white p-4 sm:p-6 rounded-xl shadow-sm border border-gray-100 transition-all duration-200 hover:shadow-lg hover:-translate-y-1 cursor-pointer">
               <div className="flex items-center gap-4">
                 <div className="w-12 h-12 bg-yellow-100 rounded-lg flex items-center justify-center">
@@ -93,7 +206,9 @@ const AdminDashboard = () => {
                 </div>
                 <div>
                   <p className="text-sm text-gray-600">Total Revenue</p>
-                  <p className="text-2xl font-bold text-gray-900">$50,000</p>
+                  <p className="text-2xl font-bold text-gray-900">
+                    {loading ? '...' : `$${stats.totalRevenue.toLocaleString()}`}
+                  </p>
                 </div>
               </div>
             </div>
@@ -101,73 +216,55 @@ const AdminDashboard = () => {
 
           {/* Charts Section */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-8 mb-8">
-            {/* Monthly Revenue */}
+            {/* Monthly Revenue (Line Chart) */}
             <div className="bg-white p-4 sm:p-6 rounded-xl shadow-sm border border-gray-100 transition-all duration-200 hover:shadow-lg hover:-translate-y-1 cursor-pointer">
               <div className="mb-6">
                 <h3 className="text-lg font-semibold text-gray-900">Monthly Revenue</h3>
                 <div className="flex flex-wrap items-center gap-2 mt-2">
-                  <span className="text-3xl font-bold text-gray-900">$5,000</span>
+                  <span className="text-3xl font-bold text-gray-900">
+                    ${loading ? '...' : Math.round(stats.totalRevenue).toLocaleString()}
+                  </span>
                   <span className="text-sm text-gray-600">This Month</span>
-                  <span className="text-sm font-medium text-green-600">+10%</span>
                 </div>
               </div>
-              
-              {/* Simple Line Chart Visualization */}
-              <div className="relative h-48">
-                <svg className="w-full h-full" viewBox="0 0 400 200">
-                  <defs>
-                    <linearGradient id="lineGradient" x1="0%" y1="0%" x2="0%" y2="100%">
-                      <stop offset="0%" stopColor="#ef4444" stopOpacity="0.3"/>
-                      <stop offset="100%" stopColor="#ef4444" stopOpacity="0"/>
-                    </linearGradient>
-                  </defs>
-                  <path
-                    d="M 20 150 Q 80 100 120 130 Q 160 80 200 120 Q 240 60 280 90 Q 320 40 380 30"
-                    fill="none"
-                    stroke="#ef4444"
-                    strokeWidth="3"
-                    strokeLinecap="round"
-                  />
-                  <path
-                    d="M 20 150 Q 80 100 120 130 Q 160 80 200 120 Q 240 60 280 90 Q 320 40 380 30 L 380 200 L 20 200 Z"
-                    fill="url(#lineGradient)"
-                  />
-                </svg>
-                {/* Graph Details */}
-                <div className="absolute bottom-2 left-2 right-2 flex justify-between text-xs text-gray-500">
-                  {monthlyData.map((item) => (
-                    <div key={item.month} className="flex flex-col items-center">
-                      <span>{item.month}</span>
-                      <span className="font-semibold text-gray-700">{item.value}</span>
-                    </div>
-                  ))}
-                </div>
+
+              {/* ✅ Dynamic Line Chart */}
+              <div className="h-64">
+                <ResponsiveContainer width="100%" height="100%">
+                  <LineChart data={monthlyRevenueData}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+                    <XAxis dataKey="month" />
+                    <YAxis />
+                    <Tooltip />
+                    <Line type="monotone" dataKey="value" stroke="#ef4444" strokeWidth={3} dot={{ r: 5 }} />
+                  </LineChart>
+                </ResponsiveContainer>
               </div>
             </div>
 
-            {/* Student Growth */}
+            {/* Student Growth (Bar Chart) */}
             <div className="bg-white p-4 sm:p-6 rounded-xl shadow-sm border border-gray-100 transition-all duration-200 hover:shadow-lg hover:-translate-y-1 cursor-pointer">
               <div className="mb-6">
                 <h3 className="text-lg font-semibold text-gray-900">Student Growth</h3>
                 <div className="flex flex-wrap items-center gap-2 mt-2">
-                  <span className="text-3xl font-bold text-gray-900">+15%</span>
-                  <span className="text-sm text-gray-600">This Month</span>
-                  <span className="text-sm font-medium text-green-600">+5%</span>
+                  <span className="text-3xl font-bold text-gray-900">
+                    {loading ? '...' : stats.totalStudents}
+                  </span>
+                  <span className="text-sm text-gray-600">New Students</span>
                 </div>
               </div>
-              
-              {/* Bar Chart */}
-              <div className="flex items-end justify-between h-48 gap-2">
-                {monthlyData.map((item, index) => (
-                  <div key={item.month} className="flex flex-col items-center flex-1">
-                    <div 
-                      className={`w-full rounded-t ${index === monthlyData.length - 1 ? 'bg-red-500' : 'bg-red-200'} transition-all`}
-                      style={{ height: `${(item.value / 60) * 100}%` }}
-                    />
-                    <span className="text-xs text-gray-500 mt-2">{item.month}</span>
-                    <span className="font-semibold text-gray-700">{item.value}</span>
-                  </div>
-                ))}
+
+              {/* ✅ Dynamic Bar Chart */}
+              <div className="h-64">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={monthlyStudentData}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+                    <XAxis dataKey="month" />
+                    <YAxis />
+                    <Tooltip />
+                    <Bar dataKey="value" fill="#ef4444" radius={[8, 8, 0, 0]} />
+                  </BarChart>
+                </ResponsiveContainer>
               </div>
             </div>
           </div>
