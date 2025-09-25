@@ -30,6 +30,7 @@ const AdminDashboard = () => {
     totalRevenue: 0,
   });
   
+  const [recentActivities, setRecentActivities] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -49,8 +50,6 @@ const AdminDashboard = () => {
   const generateMonthlyData = (total) => {
     const months = getLast6Months();
     const today = new Date();
-    const currentMonth = today.getMonth();
-
     return months.map((month, i) => {
       const isCurrentMonth = month === months[months.length - 1]; // last item = current month
       return {
@@ -60,40 +59,41 @@ const AdminDashboard = () => {
     });
   };
 
-  const monthlyRevenueData = generateMonthlyData(stats.totalRevenue / 1000); // Scale for better visualization
+  const monthlyRevenueData = generateMonthlyData(stats.totalRevenue / 1000); // Scale for visualization
   const monthlyStudentData = generateMonthlyData(stats.totalStudents);
 
-  // Fetch stats from backend
+  // Fetch stats & recent activities from backend
   useEffect(() => {
-    const fetchStats = async () => {
+    const fetchDashboardData = async () => {
       try {
         setLoading(true);
         setError(null);
         
         const token = localStorage.getItem('token');
-        if (!token) {
-          throw new Error('No authentication token found');
-        }
+        if (!token) throw new Error('No authentication token found');
 
-        console.log('Fetching dashboard stats...'); // Debug log
-        
-        const res = await axios.get('http://localhost:5000/api/dashboard/stats', {
+        // Fetch stats
+        const statsRes = await axios.get('http://localhost:5000/api/dashboard/stats', {
           headers: { Authorization: `Bearer ${token}` },
         });
 
-        console.log('API Response:', res.data); // Debug log
-
-        const data = res.data;
+        const statsData = statsRes.data;
         setStats({
-          totalStudents: data.totalStudents ?? 0,
-          totalInstructors: data.totalInstructors ?? 0,
-          totalCourses: data.totalCourses ?? 0,
-          totalRevenue: data.totalRevenue ?? 0,
+          totalStudents: statsData.totalStudents ?? 0,
+          totalInstructors: statsData.totalInstructors ?? 0,
+          totalCourses: statsData.totalCourses ?? 0,
+          totalRevenue: statsData.totalRevenue ?? 0,
         });
-        
+
+        // Fetch recent activities
+        const activitiesRes = await axios.get('http://localhost:5000/api/dashboard/activities', {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        setRecentActivities(activitiesRes.data);
+
       } catch (error) {
-        console.error('Error fetching dashboard stats:', error);
-        setError(error.response?.data?.error || error.message || 'Failed to fetch stats');
+        console.error('Error fetching dashboard data:', error);
+        setError(error.response?.data?.error || error.message || 'Failed to fetch dashboard data');
         
         setStats({
           totalStudents: 0,
@@ -101,31 +101,14 @@ const AdminDashboard = () => {
           totalCourses: 0,
           totalRevenue: 0,
         });
+        setRecentActivities([]);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchStats();
+    fetchDashboardData();
   }, []);
-
-  const recentActivities = [
-    {
-      activity: "New Student Registration",
-      details: "Sophia Clark registered for the 'Data Science Fundamentals' course",
-      date: "2024-07-26"
-    },
-    {
-      activity: "Recently Published Course",
-      details: "Dr. Ethan Bennett published 'Advanced Machine Learning Techniques'",
-      date: "2024-07-25"
-    },
-    {
-      activity: "Latest Enrollment",
-      details: "Liam Harper enrolled in 'Web Development Bootcamp'",
-      date: "2024-07-24"
-    }
-  ];
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -294,6 +277,9 @@ const AdminDashboard = () => {
                   </div>
                 </div>
               ))}
+              {recentActivities.length === 0 && !loading && (
+                <p className="text-center text-gray-500 py-4">No recent activities found.</p>
+              )}
             </div>
           </div>
         </div>

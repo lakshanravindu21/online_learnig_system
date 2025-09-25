@@ -132,7 +132,7 @@ app.post("/api/contact", authenticateToken, async (req, res) => {
     const user = await prisma.user.findUnique({ where: { id: req.user.id }, select: { email: true, name: true } });
     if (!user) return res.status(404).json({ error: "User not found" });
 
-    const transporter = nodemailer.createTransporter({
+    const transporter = nodemailer.createTransport({
       host: "smtp.gmail.com",
       port: 465,
       secure: true,
@@ -176,48 +176,87 @@ app.get("/api/admin/dashboard", authenticateToken, requireAdmin, (req, res) => {
 // ==================================================
 app.get("/api/dashboard/stats", authenticateToken, requireAdmin, async (req, res) => {
   try {
-    console.log("Fetching dashboard stats..."); // Debug log
-    
-    // Count total students (checking multiple role variations)
+    // Count total students (all variations)
     const totalStudents = await prisma.user.count({ 
-      where: { 
-        OR: [
-          { role: "student" },
-          { role: "STUDENT" },
-          { role: "Student" }
-        ]
-      } 
+      where: { OR: [{ role: "student" }, { role: "STUDENT" }, { role: "Student" }] } 
     });
     
-    // Count total instructors (checking multiple role variations)
+    // Count total instructors (all variations)
     const totalInstructors = await prisma.user.count({ 
-      where: { 
-        OR: [
-          { role: "instructor" },
-          { role: "INSTRUCTOR" },
-          { role: "Instructor" }
-        ]
-      } 
+      where: { OR: [{ role: "instructor" }, { role: "INSTRUCTOR" }, { role: "Instructor" }] } 
     });
     
-    // Count total courses
     const totalCourses = await prisma.course.count();
 
-    // Calculate total revenue dynamically (price * enrolledCount)
-    const courses = await prisma.course.findMany({
-      select: { price: true, enrolledCount: true },
-    });
+    const courses = await prisma.course.findMany({ select: { price: true, enrolledCount: true } });
 
-    const totalRevenue = courses.reduce((acc, course) => {
-      return acc + (course.price || 0) * (course.enrolledCount || 0);
-    }, 0);
-
-    console.log("Dashboard stats:", { totalStudents, totalInstructors, totalCourses, totalRevenue }); // Debug log
+    const totalRevenue = courses.reduce((acc, course) => acc + (course.price || 0) * (course.enrolledCount || 0), 0);
 
     res.json({ totalStudents, totalInstructors, totalCourses, totalRevenue });
   } catch (err) {
     console.error("Error fetching dashboard stats:", err);
     res.status(500).json({ error: "Failed to fetch dashboard stats" });
+  }
+});
+
+// ==================================================
+// 🔹 Dashboard activities route (NEW)
+// ==================================================
+app.get("/api/dashboard/activities", authenticateToken, requireAdmin, async (req, res) => {
+  try {
+    const activities = [];
+
+    // Latest 2 student registrations
+    const recentStudents = await prisma.user.findMany({
+      where: { role: "STUDENT" },
+      orderBy: { createdAt: "desc" },
+      take: 2,
+    });
+
+    recentStudents.forEach(student => {
+      activities.push({
+        activity: "New Student Registration",
+        details: `${student.name} registered`,
+        date: student.createdAt.toISOString().split("T")[0],
+      });
+    });
+
+    // Latest 2 published courses
+    const recentCourses = await prisma.course.findMany({
+      orderBy: { createdAt: "desc" },
+      include: { instructor: true },
+      take: 2,
+    });
+
+    recentCourses.forEach(course => {
+      activities.push({
+        activity: "Recently Published Course",
+        details: `${course.instructor.name} published '${course.title}'`,
+        date: course.createdAt.toISOString().split("T")[0],
+      });
+    });
+
+    // Latest enrollment
+    const latestEnrollment = await prisma.enrollment.findFirst({
+      orderBy: { createdAt: "desc" },
+      include: { user: true, course: true },
+    });
+
+    if (latestEnrollment) {
+      activities.push({
+        activity: "Latest Enrollment",
+        details: `${latestEnrollment.user.name} enrolled in '${latestEnrollment.course.title}'`,
+        date: latestEnrollment.createdAt.toISOString().split("T")[0],
+      });
+    }
+
+    // Sort descending
+    activities.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+    res.json(activities);
+  } catch (err) {
+    console.error("Error fetching recent activities:", err);
+    res.status(500).json({ error: "Failed to fetch recent activities" });
   }
 });
 
