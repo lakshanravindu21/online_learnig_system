@@ -9,14 +9,15 @@ datasource db {
 }
 
 model User {
-  id       Int     @id @default(autoincrement())
-  name     String
-  email    String  @unique
-  password String? // optional for Google login
-  role     String  // "student" | "instructor" | "admin"
-  contact  String? 
-  status   String? @default("Active") 
-  rating   Float?  
+  id           Int     @id @default(autoincrement())
+  name         String
+  email        String  @unique
+  password     String? // optional for Google login
+  role         String  // "student" | "instructor" | "admin"
+  contact      String? 
+  status       String? @default("Active") 
+  rating       Float?  
+  profileImage String?   // ✅ New field for instructor profile image
 
   // Relations
   courses     Course[]         @relation("CourseInstructor")
