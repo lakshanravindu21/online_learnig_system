@@ -368,7 +368,53 @@ app.get("/api/students", authenticateToken, requireAdmin, async (req, res) => {
   }
 });
 
-// Instructor Management API with email functionality
+// Public Instructors Route (No Authentication Required)
+app.get("/api/instructors/public", async (req, res) => {
+  try {
+    const instructors = await prisma.user.findMany({
+      where: { 
+        role: "instructor",
+        status: "Active"
+      },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        rating: true,
+        status: true,
+        profileImage: true,
+        contact: true,
+        createdAt: true,
+        courses: {
+          select: {
+            id: true,
+            title: true
+          }
+        }
+      },
+      orderBy: { createdAt: "desc" },
+    });
+
+    const data = instructors.map((inst) => ({
+      id: inst.id,
+      name: inst.name,
+      email: inst.email,
+      totalCourses: inst.courses.length,
+      rating: inst.rating || 0,
+      status: inst.status,
+      profileImage: inst.profileImage || null,
+      contact: inst.contact,
+      createdAt: inst.createdAt,
+    }));
+
+    res.json(data);
+  } catch (err) {
+    console.error("Error fetching public instructors:", err);
+    res.status(500).json({ message: "Failed to fetch instructors" });
+  }
+});
+
+// Instructor Management API with email functionality (EXISTING ROUTES - UNCHANGED)
 app.post("/api/instructors", authenticateToken, requireAdmin, upload.single("profileImage"), async (req, res) => {
   try {
     const { name, email, contact, status, rating } = req.body;
@@ -513,7 +559,7 @@ app.get("/api/instructors", authenticateToken, requireAdmin, async (req, res) =>
     if (status && status !== "All") where.status = status;
     if (search) where.OR = [{ name: { contains: search, mode: "insensitive" } }, { email: { contains: search, mode: "insensitive" } }];
 
-    const instructors = await prisma.user.findMany({ where, include: { courses: true }, orderBy: { id: "asc" } });
+    const instructors = await prisma.user.findMany({ where, include: { courses: true }, orderBy: { createdAt: "desc" } });
     const data = instructors.map((inst) => ({
       id: inst.id,
       name: inst.name,
@@ -523,6 +569,7 @@ app.get("/api/instructors", authenticateToken, requireAdmin, async (req, res) =>
       status: inst.status,
       contact: inst.contact,
       profileImage: inst.profileImage || null,
+      createdAt: inst.createdAt,
     }));
 
     res.json(data);
